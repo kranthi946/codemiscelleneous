@@ -1,0 +1,113 @@
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamExample {
+
+    public static void main(String[] args) {
+
+        // Test data: List of GainerItem objects
+        List<GainerItem> gainersList = new ArrayList<>();
+        gainersList.add(new GainerItem("Exicom Tele-Systems", 269.35, 314.95, 16.93));
+        gainersList.add(new GainerItem("Awfis Space Solution", 383.00, 445.15, 16.23));
+        gainersList.add(new GainerItem("Awfis", 521.65, 605.40, 16.05));
+        gainersList.add(new GainerItem("kranthi", 522.65, 604.40, 16.05));
+        gainersList.add(new GainerItem("DER", 673.65, 777.00, 15.34));
+        gainersList.add(new GainerItem("Nakoda Group Of Ind", 44.60, 50.02, 12.15));
+        gainersList.add(new GainerItem("Amerise Biosciences", 0.62, 0.69, 11.29));
+        gainersList.add(new GainerItem("Sahyadri Industries", 341.05, 378.05, 10.85));
+        gainersList.add(new GainerItem("Indong Tea Company", 23.50, 26.00, 10.64));
+        gainersList.add(new GainerItem("kranthi1", 53.00, 58.55, 10.47));
+
+        // 1. Filtering and Mapping with Stream Operations
+        System.out.println("1. Filtering and Mapping:");
+
+        // Input: gainersList (same as above)
+        List<String> cl = gainersList.stream()
+            // Step 1: Filtering companies starting with 'A' and whose names are longer than 3 characters
+            .filter(cn -> cn.getCompanyName().toLowerCase().startsWith("a"))
+            .filter(cn -> cn.getCompanyName().length() > 3)
+            // Output after filtering: Only companies that start with 'A' and are longer than 3 characters
+            // "Awfis Space Solution", "Awfis", "Amerise Biosciences"
+            .peek(cn -> System.out.println("Filtered company: " + cn.getCompanyName()))
+
+            // Step 2: Mapping company names to replace 'S' with 'K'
+            .map(cn -> cn.getCompanyName().replaceAll("S", "K"))
+            // Output after mapping: Company names with 'S' replaced by 'K'
+            // "Awfi Kape Kolution", "Awfi", "Amerike Bioicines"
+            .sorted(Collections.reverseOrder()) // Sorting in reverse order
+
+            // Step 3: Collecting the results into a new list
+            .collect(Collectors.toList());
+
+        // Output: Final transformed list after filtering, mapping, and sorting
+        // ["Krathi", "Awfi", "Awfi", "Amerie Bioicines", "Aherdri Inustry"]
+        System.out.println("Final list after transformation: " + cl);
+
+        // 2. Foreach to Filter and Print Companies with Current Price < 200
+        System.out.println("\n2. FOREACH");
+
+        // Input: gainersList (same as above)
+        gainersList.stream()
+            // Step 1: Filtering companies with current price < 200
+            .filter(cn -> cn.getCurrentPrice() < 200)
+            // Output after filtering: Companies with current price less than 200
+            // "Nakoda Group Of Ind", "Amerise Biosciences", "Indong Tea Company", "kranthi1"
+            .forEach(cn -> System.out.println("Company with price < 200: " + cn.getCompanyName()));
+
+        // 3. Counting the Number of Companies in the List
+        System.out.println("\n3. Counting:");
+
+        // Input: gainersList (same as above)
+        long count = gainersList.stream()
+            // Step 1: Counting the total number of companies
+            .count();
+
+        // Output: Total count of companies in the list
+        // Total number of companies: 10
+        System.out.println("Total number of companies: " + count);
+
+        // 4. Get Minimum and Maximum of PercentChange
+        System.out.println("\n4. Minimum and Maximum Percent Change:");
+
+        // Input: gainersList (same as above)
+        Optional<GainerItem> minChange = gainersList.stream()
+            // Step 1: Finding the minimum percent change
+            .min(Comparator.comparingDouble(GainerItem::getPercentChange));
+
+        // Step 2: Finding the maximum percent change
+        Optional<GainerItem> maxChange = gainersList.stream()
+            .max(Comparator.comparingDouble(GainerItem::getPercentChange));
+
+        // Output: Company with minimum and maximum percent change
+        // Min percent change: "Amerise Biosciences" with 11.29%
+        // Max percent change: "Exicom Tele-Systems" with 16.93%
+        minChange.ifPresent(cn -> System.out.println("Min percent change: " + cn.getCompanyName() + " with " + cn.getPercentChange() + "%"));
+        maxChange.ifPresent(cn -> System.out.println("Max percent change: " + cn.getCompanyName() + " with " + cn.getPercentChange() + "%"));
+
+        // 5. Sum of Percent Changes
+        System.out.println("\n5. Sum of Percent Changes:");
+
+        // Input: gainersList (same as above)
+        double totalPercentChange = gainersList.stream()
+            // Step 1: Summing up the percent changes for all companies
+            .mapToDouble(GainerItem::getPercentChange)
+            .sum();
+
+        // Output: Total percent change for all companies
+        // Total percent change: 121.74
+        System.out.println("Total percent change: " + totalPercentChange);
+
+        // 6. Average of Percent Changes
+        System.out.println("\n6. Average of Percent Changes:");
+
+        // Input: gainersList (same as above)
+        OptionalDouble avgPercentChange = gainersList.stream()
+            // Step 1: Calculating the average percent change
+            .mapToDouble(GainerItem::getPercentChange)
+            .average();
+
+        // Output: Average percent change for all companies
+        // Average percent change: 12.17
+        avgPercentChange.ifPresent(avg -> System.out.println("Average percent change: " + avg));
+    }
+}
